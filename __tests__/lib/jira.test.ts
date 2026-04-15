@@ -1,4 +1,4 @@
-import { getCloudId, searchIssues, mapIssue } from '@/lib/jira'
+import { getCloudId, mapIssue, _resetCloudIdCache } from '@/lib/jira'
 
 const MOCK_TOKEN = 'mock-access-token'
 const MOCK_CLOUD_ID = 'mock-cloud-id'
@@ -73,12 +73,11 @@ describe('mapIssue', () => {
 
 describe('getCloudId', () => {
   beforeEach(() => {
-    // Reset module-level cache between tests
-    jest.resetModules()
+    _resetCloudIdCache()
+    process.env.JIRA_DOMAIN = 'sovos.atlassian.net'
   })
 
   it('returns the cloudId for the configured domain', async () => {
-    process.env.JIRA_DOMAIN = 'sovos.atlassian.net'
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => [
@@ -87,19 +86,16 @@ describe('getCloudId', () => {
       ],
     }) as jest.Mock
 
-    const { getCloudId } = await import('@/lib/jira')
     const cloudId = await getCloudId(MOCK_TOKEN)
     expect(cloudId).toBe(MOCK_CLOUD_ID)
   })
 
   it('throws when domain not found in accessible resources', async () => {
-    process.env.JIRA_DOMAIN = 'sovos.atlassian.net'
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => [{ id: 'other-id', url: 'https://other.atlassian.net' }],
     }) as jest.Mock
 
-    const { getCloudId } = await import('@/lib/jira')
     await expect(getCloudId(MOCK_TOKEN)).rejects.toThrow('Jira site not found')
   })
 })

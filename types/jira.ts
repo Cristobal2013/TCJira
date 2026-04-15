@@ -1,6 +1,7 @@
 // types/jira.ts
 
-export type IssueStatus = 'To Do' | 'In Progress' | 'Done'
+// Jira puede devolver estados custom (ej: "In Review", "Blocked") además de los estándar
+export type IssueStatus = string
 // Jira puede devolver tipos custom definidos en el proyecto además de los estándar
 export type IssueType = string
 
