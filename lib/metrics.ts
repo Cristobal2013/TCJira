@@ -4,15 +4,16 @@ import type { JiraIssue, JiraUser, MemberMetrics, TeamMetrics, IssueFilters } fr
 export function calculateMemberMetrics(member: JiraUser, issues: JiraIssue[]): MemberMetrics {
   const open = issues.filter(i => i.status === 'To Do').length
   const inProgress = issues.filter(i => i.status === 'In Progress').length
-  const closed = issues.filter(i => i.status === 'Done' && i.resolutionDate !== null)
+  const closedIssues = issues.filter(i => i.status === 'Done')
+  const resolvable = closedIssues.filter(i => i.resolutionDate !== null)
 
-  const avgResolutionDays = closed.length === 0
+  const avgResolutionDays = resolvable.length === 0
     ? null
-    : closed.reduce((sum, issue) => {
+    : resolvable.reduce((sum, issue) => {
         const created = new Date(issue.created).getTime()
         const resolved = new Date(issue.resolutionDate!).getTime()
         return sum + (resolved - created) / (1000 * 60 * 60 * 24)
-      }, 0) / closed.length
+      }, 0) / resolvable.length
 
   const byType: Record<string, number> = {}
   for (const issue of issues) {
@@ -23,7 +24,7 @@ export function calculateMemberMetrics(member: JiraUser, issues: JiraIssue[]): M
     member,
     open,
     inProgress,
-    closed: closed.length,
+    closed: closedIssues.length,
     avgResolutionDays: avgResolutionDays !== null ? Math.round(avgResolutionDays * 10) / 10 : null,
     byType,
   }
@@ -32,6 +33,7 @@ export function calculateMemberMetrics(member: JiraUser, issues: JiraIssue[]): M
 export function calculateTeamMetrics(issues: JiraIssue[]): TeamMetrics {
   const byMember = new Map<string, { user: JiraUser; issues: JiraIssue[] }>()
   for (const issue of issues) {
+    if (!issue.assignee) continue
     const { accountId } = issue.assignee
     if (!byMember.has(accountId)) {
       byMember.set(accountId, { user: issue.assignee, issues: [] })

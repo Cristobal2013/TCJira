@@ -57,6 +57,13 @@ describe('calculateMemberMetrics', () => {
     expect(result.avgResolutionDays).toBeNull()
   })
 
+  it('counts Done tickets without resolutionDate as closed', () => {
+    const issues: JiraIssue[] = [{ ...baseIssue, status: 'Done', resolutionDate: null }]
+    const result = calculateMemberMetrics(mockUser, issues)
+    expect(result.closed).toBe(1)
+    expect(result.avgResolutionDays).toBeNull()
+  })
+
   it('counts byType correctly', () => {
     const issues: JiraIssue[] = [
       { ...baseIssue, issueType: 'Bug' },
