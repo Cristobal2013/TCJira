@@ -140,7 +140,10 @@ Las credenciales OAuth se obtienen desde [Atlassian Developer Console](https://d
 
 ## Fuera de alcance (v1)
 
-- Notificaciones o alertas
 - Exportar a PDF/Excel
 - Vista de historial de sprints (no aplica, es Kanban)
 - Editar tickets desde el dashboard
+
+## Roadmap (v2)
+
+- **Notificaciones por email:** Enviar alerta cuando un ticket lleva más de N días abierto (umbral configurable). El email va al assignee y/o manager. Implementar con Resend o SendGrid desde Next.js API routes.
