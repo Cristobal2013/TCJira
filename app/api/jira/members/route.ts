@@ -7,10 +7,17 @@ import type { JiraUser } from '@/types/jira'
 
 const PROJECT_KEY = process.env.JIRA_PROJECT_KEY!
 
+let membersCache: { data: JiraUser[]; expiresAt: number } | null = null
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
 export async function GET() {
   const session = await auth()
   if (!session?.accessToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (membersCache && membersCache.expiresAt > Date.now()) {
+    return NextResponse.json(membersCache.data)
   }
 
   try {
@@ -27,6 +34,7 @@ export async function GET() {
       }
     }
 
+    membersCache = { data: members, expiresAt: Date.now() + CACHE_TTL_MS }
     return NextResponse.json(members)
   } catch (error) {
     console.error('Jira members fetch error:', error)
