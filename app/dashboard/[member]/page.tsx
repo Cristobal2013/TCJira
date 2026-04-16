@@ -3,7 +3,6 @@
 import { use } from 'react'
 import useSWR from 'swr'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { IssueTable } from '@/components/member/IssueTable'
 import { ResolutionChart } from '@/components/member/ResolutionChart'
 import { calculateMemberMetrics } from '@/lib/metrics'
@@ -29,9 +28,12 @@ export default function MemberPage({ params }: PageProps) {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard">← Volver</Link>
-        </Button>
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-1 rounded-lg px-2.5 text-sm font-medium h-7 hover:bg-muted hover:text-foreground transition-colors"
+        >
+          ← Volver
+        </Link>
         {member && (
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}

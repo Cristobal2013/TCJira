@@ -36,7 +36,7 @@ export function FilterPanel({ filters, onChange, onRefresh, isLoading }: FilterP
         <label className="text-sm font-medium">Período</label>
         <Select
           value={''}
-          onValueChange={val => onChange({ ...filters, dateFrom: getDateFrom(val) })}
+          onValueChange={val => onChange({ ...filters, dateFrom: getDateFrom(val ?? '') })}
         >
           <SelectTrigger><SelectValue placeholder="Todo" /></SelectTrigger>
           <SelectContent>
@@ -51,7 +51,7 @@ export function FilterPanel({ filters, onChange, onRefresh, isLoading }: FilterP
         <label className="text-sm font-medium">Tipo</label>
         <Select
           value={filters.issueType ?? '_all'}
-          onValueChange={val => onChange({ ...filters, issueType: val === '_all' ? undefined : val })}
+          onValueChange={val => onChange({ ...filters, issueType: (val == null || val === '_all') ? undefined : val })}
         >
           <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
           <SelectContent>
@@ -66,7 +66,7 @@ export function FilterPanel({ filters, onChange, onRefresh, isLoading }: FilterP
         <label className="text-sm font-medium">Estado</label>
         <Select
           value={filters.status ?? '_all'}
-          onValueChange={val => onChange({ ...filters, status: val === '_all' ? undefined : val })}
+          onValueChange={val => onChange({ ...filters, status: (val == null || val === '_all') ? undefined : val })}
         >
           <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
           <SelectContent>

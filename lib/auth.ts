@@ -1,5 +1,6 @@
 // lib/auth.ts
-import NextAuth from 'next-auth'
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const NextAuth = require('next-auth').default ?? require('next-auth')
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -31,7 +32,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   ],
   callbacks: {
-    async jwt({ token, account }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, account }: { token: any; account: any }) {
       if (account) {
         token.accessToken = account.access_token as string
         token.refreshToken = account.refresh_token as string | undefined
@@ -39,11 +41,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
-    async session({ session, token }) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      session.accessToken = (token as any).accessToken as string
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((token as any).error) session.error = (token as any).error as string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, token }: { session: any; token: any }) {
+      session.accessToken = token.accessToken as string
+      if (token.error) session.error = token.error as string
       return session
     },
   },
