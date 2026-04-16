@@ -11,7 +11,8 @@ const baseIssue: JiraIssue = {
   id: '1',
   key: 'PSTC-1',
   summary: 'Test issue',
-  status: 'To Do',
+  status: 'COLA',
+  statusCategory: 'new',
   issueType: 'Task',
   assignee: mockUser,
   created: '2026-04-01T00:00:00.000Z',
@@ -21,10 +22,10 @@ const baseIssue: JiraIssue = {
 describe('calculateMemberMetrics', () => {
   it('counts open, inProgress and closed correctly', () => {
     const issues: JiraIssue[] = [
-      { ...baseIssue, status: 'To Do' },
-      { ...baseIssue, status: 'In Progress' },
-      { ...baseIssue, status: 'Done', resolutionDate: '2026-04-06T00:00:00.000Z' },
-      { ...baseIssue, status: 'Done', resolutionDate: '2026-04-11T00:00:00.000Z' },
+      { ...baseIssue, status: 'COLA', statusCategory: 'new' },
+      { ...baseIssue, status: 'EN PROGRESO', statusCategory: 'indeterminate' },
+      { ...baseIssue, status: 'FINALIZADO', statusCategory: 'done', resolutionDate: '2026-04-06T00:00:00.000Z' },
+      { ...baseIssue, status: 'FINALIZADO', statusCategory: 'done', resolutionDate: '2026-04-11T00:00:00.000Z' },
     ]
     const result = calculateMemberMetrics(mockUser, issues)
     expect(result.open).toBe(1)
@@ -36,13 +37,15 @@ describe('calculateMemberMetrics', () => {
     const issues: JiraIssue[] = [
       {
         ...baseIssue,
-        status: 'Done',
+        status: 'FINALIZADO',
+        statusCategory: 'done',
         created: '2026-04-01T00:00:00.000Z',
         resolutionDate: '2026-04-06T00:00:00.000Z', // 5 days
       },
       {
         ...baseIssue,
-        status: 'Done',
+        status: 'FINALIZADO',
+        statusCategory: 'done',
         created: '2026-04-01T00:00:00.000Z',
         resolutionDate: '2026-04-11T00:00:00.000Z', // 10 days
       },
@@ -52,13 +55,13 @@ describe('calculateMemberMetrics', () => {
   })
 
   it('returns null avgResolutionDays when no closed tickets', () => {
-    const issues: JiraIssue[] = [{ ...baseIssue, status: 'To Do' }]
+    const issues: JiraIssue[] = [{ ...baseIssue, statusCategory: 'new' }]
     const result = calculateMemberMetrics(mockUser, issues)
     expect(result.avgResolutionDays).toBeNull()
   })
 
   it('counts Done tickets without resolutionDate as closed', () => {
-    const issues: JiraIssue[] = [{ ...baseIssue, status: 'Done', resolutionDate: null }]
+    const issues: JiraIssue[] = [{ ...baseIssue, statusCategory: 'done', resolutionDate: null }]
     const result = calculateMemberMetrics(mockUser, issues)
     expect(result.closed).toBe(1)
     expect(result.avgResolutionDays).toBeNull()
@@ -79,9 +82,9 @@ describe('calculateTeamMetrics', () => {
   it('aggregates totals across all members', () => {
     const user2 = { ...mockUser, accountId: 'u2', displayName: 'Maria' }
     const issues: JiraIssue[] = [
-      { ...baseIssue, assignee: mockUser, status: 'To Do' },
-      { ...baseIssue, assignee: mockUser, status: 'In Progress' },
-      { ...baseIssue, assignee: user2, status: 'Done', resolutionDate: '2026-04-06T00:00:00.000Z' },
+      { ...baseIssue, assignee: mockUser, statusCategory: 'new' },
+      { ...baseIssue, assignee: mockUser, statusCategory: 'indeterminate' },
+      { ...baseIssue, assignee: user2, statusCategory: 'done', resolutionDate: '2026-04-06T00:00:00.000Z' },
     ]
     const result = calculateTeamMetrics(issues)
     expect(result.totalOpen).toBe(1)

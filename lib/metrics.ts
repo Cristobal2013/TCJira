@@ -2,9 +2,10 @@
 import type { JiraIssue, JiraUser, MemberMetrics, TeamMetrics, IssueFilters } from '@/types/jira'
 
 export function calculateMemberMetrics(member: JiraUser, issues: JiraIssue[]): MemberMetrics {
-  const open = issues.filter(i => i.status === 'To Do').length
-  const inProgress = issues.filter(i => i.status === 'In Progress').length
-  const closedIssues = issues.filter(i => i.status === 'Done')
+  // Usar statusCategory para ser independiente del idioma del Jira
+  const open = issues.filter(i => i.statusCategory === 'new').length
+  const inProgress = issues.filter(i => i.statusCategory === 'indeterminate').length
+  const closedIssues = issues.filter(i => i.statusCategory === 'done')
   const resolvable = closedIssues.filter(i => i.resolutionDate !== null)
 
   const avgResolutionDays = resolvable.length === 0

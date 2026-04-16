@@ -12,11 +12,15 @@ export interface JiraUser {
   emailAddress?: string
 }
 
+// 'new' = abierto, 'indeterminate' = en progreso, 'done' = cerrado
+export type StatusCategory = 'new' | 'indeterminate' | 'done'
+
 export interface JiraIssue {
   id: string
   key: string
   summary: string
   status: IssueStatus
+  statusCategory: StatusCategory   // independiente del idioma
   issueType: IssueType
   assignee: JiraUser | null  // null para tickets sin asignar (filtrado por JQL pero defensivo)
   created: string        // ISO 8601
@@ -25,9 +29,9 @@ export interface JiraIssue {
 
 export interface MemberMetrics {
   member: JiraUser
-  open: number           // status = "To Do"
-  inProgress: number     // status = "In Progress"
-  closed: number         // status = "Done" (con o sin resolutionDate)
+  open: number           // statusCategory = "new"
+  inProgress: number     // statusCategory = "indeterminate"
+  closed: number         // statusCategory = "done"
   avgResolutionDays: number | null   // null if no closed tickets
   byType: Record<string, number>     // { Bug: 2, Task: 5, Story: 1 }
 }

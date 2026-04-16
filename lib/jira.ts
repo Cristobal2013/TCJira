@@ -1,7 +1,7 @@
 // lib/jira.ts
-import type { JiraIssue, JiraUser } from '@/types/jira'
+import type { JiraIssue, JiraUser, StatusCategory } from '@/types/jira'
 
-const FIELDS = 'summary,status,issuetype,assignee,created,resolutiondate'
+const FIELDS = ['summary', 'status', 'issuetype', 'assignee', 'created', 'resolutiondate']
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapIssue(raw: any): JiraIssue {
@@ -21,6 +21,7 @@ export function mapIssue(raw: any): JiraIssue {
     key: raw.key,
     summary: fields.summary,
     status: fields.status.name,
+    statusCategory: (fields.status.statusCategory?.key ?? 'new') as StatusCategory,
     issueType: fields.issuetype.name,
     assignee,
     created: fields.created,
@@ -74,7 +75,7 @@ export async function searchIssues(
     },
     body: JSON.stringify({
       jql,
-      fields: FIELDS.split(','),
+      fields: FIELDS,
       maxResults,
     }),
   })
