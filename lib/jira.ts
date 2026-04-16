@@ -63,14 +63,20 @@ export async function searchIssues(
 ): Promise<JiraIssue[]> {
   const cloudId = await getCloudId(accessToken)
   const base = `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3`
-  const params = new URLSearchParams({
-    jql,
-    fields: FIELDS,
-    maxResults: String(maxResults),
-  })
 
-  const res = await fetch(`${base}/search?${params}`, {
-    headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+  // POST /search/jql es el endpoint vigente (GET /search retorna 410 Gone)
+  const res = await fetch(`${base}/search/jql`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      jql,
+      fields: FIELDS.split(','),
+      maxResults,
+    }),
   })
 
   if (!res.ok) throw new Error(`Jira search failed: ${res.status}`)
